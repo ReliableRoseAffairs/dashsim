@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f1f1f1;
+        }
+        header {
+            background-color: #007;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            color: #fff;
+        }
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .investment-section, .transaction-section {
+            margin-bottom: 20px;
+        }
+        .investment-section h2, .transaction-section h2 {
+            color: #007;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #007;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #007;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>INVESTMENT BOONGROWTH</h1>
+</header>
+
+<main>
+    <section class="investment-section">
+        <h2>Invest Now</h2>
+        <div id="balanceInfo">
+            <p><strong>Your Balance:</strong> $<span id="userBalance">0.00</span></p>
+        </div>
+        <div class="form-group">
+            <label for="investmentPlan">Select Investment Plan:</label>
+            <select id="investmentPlan">
+                <option value="100">Plan A - $100</option>
+                <option value="200">Plan B - $200</option>
+                <option value="500">Plan C - $500</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="investmentAmount">Investment Amount:</label>
+            <input type="number" id="investmentAmount" min="1" required>
+        </div>
+        <button id="investButton">Invest</button>
+    </section>
+
+    <section class="transaction-section">
+        <h2>Transaction History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody id="transactionHistory">
+                <!-- Transaction history will be populated here -->
+            </tbody>
+        </table>
+    </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+<script>
+    // Initialize Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyAtVvPjdsj84mWqaG4-7SyjbljCnslZ1SM",
+  authDomain: "hendaa-1.firebaseapp.com",
+  databaseURL: "https://hendaa-1-default-rtdb.firebaseio.com",
+  projectId: "hendaa-1",
+  storageBucket: "hendaa-1.appspot.com",
+  messagingSenderId: "831134776479",
+  appId: "1:831134776479:web:56cd7098fc69cd70a376aa"
+};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let userBalance = 0;
+
+    function getUserBalance() {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            const userId = user.uid;
+            db.collection('users').doc(userId).get().then(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    userBalance = data.balance;
+                    document.getElementById('userBalance').textContent = userBalance.toFixed(2);
+                    getTransactionHistory(userId);
+                } else {
+                    console.error('No such document!');
+                }
+            }).catch(error => {
+                console.error('Error getting document:', error);
+            });
+        } else {
+            window.location.href = 'login.html';
+        }
+    }
+
+    function getTransactionHistory(userId) {
+        db.collection('investments').where('userId', '==', userId).orderBy('timestamp', 'desc').get().then(snapshot => {
+            const transactionHistory = document.getElementById('transactionHistory');
+            transactionHistory.innerHTML = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(data.timestamp.seconds * 1000).toLocaleString()}</td>
+                    <td>${data.type}</td>
+                    <td>$${data.amount.toFixed(2)}</td>
+                `;
+                transactionHistory.appendChild(row);
+            });
+        }).catch(error => {
+            console.error('Error getting transaction history:', error);
+        });
+    }
+
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            getUserBalance();
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
+    document.getElementById('investButton').addEventListener('click', async () => {
+        const investmentPlan = parseFloat(document.getElementById('investmentPlan').value);
+        const investmentAmount = parseFloat(document.getElementById('investmentAmount').value);
+
+        if (isNaN(investmentAmount) || investmentAmount <= 0) {
+            alert('Please enter a valid investment amount.');
+            return;
+        }
+
+        if (userBalance >= investmentPlan && userBalance >= investmentAmount) {
+            try {
+                const userId = firebase.auth().currentUser.uid;
+                const newBalance = userBalance - investmentAmount;
+
+                // Update user balance
+                await db.collection('users').doc(userId).update({
+                    balance: newBalance
+                });
+
+                // Create investment transaction
+                const transaction = {
+                    userId: userId,
+                    type: 'Investment',
+                    amount: investmentAmount,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // Add transaction to the investments collection
+                const docRef = await db.collection('investments').add(transaction);
+                document.getElementById('userBalance').textContent = newBalance.toFixed(2);
+                userBalance = newBalance;
+
+                // Fetch the transaction to get the accurate timestamp
+                const newTransactionDoc = await docRef.get();
+                const newTransactionData = newTransactionDoc.data();
+
+                // Append new transaction to the transaction history table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(newTransactionData.timestamp.seconds * 1000).toLocaleString()}</td>
+                    <td>${newTransactionData.type}</td>
+                    <td>$${newTransactionData.amount.toFixed(2)}</td>
+                `;
+                document.getElementById('transactionHistory').appendChild(row);
+                alert('Investment successfully added!');
+            } catch (error) {
+                console.error('Error updating balance:', error);
+            }
+        } else {
+            alert('Low balance. Please deposit and try again.');
+        }
+    });
+</script>
+
+</body>
+</html>

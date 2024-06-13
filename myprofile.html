@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+header {
+  background-color: #007;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+header .profile-icon {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px; /* Increase icon size */
+            color: #fff;
+        }
+
+h1 {
+  margin: 0;
+  color: #fff;
+  line-height: 1.5;
+  
+}
+p {
+  color: #222;
+  line-height: 1.5;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+main {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 10px;
+}
+
+.profile-section {
+  background-color: #ffffff;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 0 10px; #fff;
+}
+
+.profile-section h2 {
+  color: #007;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  color: ;
+}
+input[type="password"],
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea {
+  width: 90%;
+  padding: 10px;
+  border: 1px solid #007;
+  border-radius: 5px;
+}
+textarea {
+  resize: vertical;
+}
+button {
+  background-color: #007;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+.link {
+  background: #007;
+  color: #fff;
+  border: none;
+  padding: 10px 10px;
+  border-radius: 5px;
+  margin-right: 20px;
+  text-decoration: none;
+  cursor: pointer;
+}
+ .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff; /* Light gray background color */
+    display: flex;
+    justify-content: space-around;
+    padding: 5px 0;
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    z-index: 1000; /* Ensure the navigation is on top of other content */
+  }
+
+  /* Bottom navigation item style */
+  .nav-item {
+    text-align: center;
+    flex-grow: 1;
+    padding: 5px 0;
+    color: #00045a; /* Default color for icons */
+    text-decoration: none;
+  }
+
+  /* Bottom navigation item icon style */
+  .nav-item i {
+    font-size: 24px; /* Adjust icon size as needed */
+  }
+
+  /* Active item style */
+  .active {
+    color: #007bff; /* Blue color for active item */
+  }
+    </style>
+</head>
+<body>
+  
+<header>
+  
+  <h1>BoonGrowth</h1>
+
+</header>
+  <main>
+    <section>
+       <div class="profile-section">
+        <h2>BoonGrowth Profile</h2>
+      
+        <div id="profileInfo">
+                   <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
+            <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
+            <p><strong>Phone:</strong> <span id="profilePhone">Loading...</span></p>
+            <p><strong>Balance:</strong> $<span id="profileBalance">0.00</span></p>
+            <p><strong>Last Login:</strong> <span id="profileLastLogin">Loading...</span></p>
+        </div>
+</section>
+<br>
+    <a href="edit-account.html" class="link">Edit /Change </a>
+        
+ <div class="bottom-nav">
+  <!-- Home -->
+  <a href="doc.html" class="nav-item">
+    <i class="fas fa-home"></i><br>
+    Home
+  </a>
+
+  <!-- Pay -->
+  <a href="deposit.html" class="nav-item">
+    <i class="fas fa-credit-card"></i><br>
+    Pay
+  </a>
+
+  <!-- More -->
+  <a href="myaccount.html" class="nav-item active">
+    <i class="fas fa-bars"></i><br>
+    My Account
+  </a>
+</div>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+     <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtVvPjdsj84mWqaG4-7SyjbljCnslZ1SM",
+  authDomain: "hendaa-1.firebaseapp.com",
+  databaseURL: "https://hendaa-1-default-rtdb.firebaseio.com",
+  projectId: "hendaa-1",
+  storageBucket: "hendaa-1.appspot.com",
+  messagingSenderId: "831134776479",
+  appId: "1:831134776479:web:56cd7098fc69cd70a376aa"
+};
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function getUserProfile() {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                const userId = user.uid;
+                db.collection('users').doc(userId).get().then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('profileName').textContent = data.name;
+                        document.getElementById('profileEmail').textContent = user.email;
+                        document.getElementById('profilePhone').textContent = data.phone || 'N/A';
+                        document.getElementById('profileBalance').textContent = data.balance.toFixed(2);
+                        document.getElementById('profileLastLogin').textContent = user.metadata.lastSignInTime;
+
+                        document.getElementById('editName').value = data.name;
+                        document.getElementById('editEmail').value = user.email;
+                        document.getElementById('editPhone').value = data.phone || '';
+                    } else {
+                        console.error('No such document!');
+                    }
+                }).catch(error => {
+                    console.error('Error getting document:', error);
+                });
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+
+        
+
+
+
+firebase.auth().onAuthStateChanged(user => {
+if (user) {
+    getUserProfile();
+} else {
+    window.location.href = 'login.html';
+}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Page</title>
+  <link rel="stylesheet" href="stylee.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Investment Page</h1>
+    <div id="auth">
+      <h2>Login</h2>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <button id="login-btn">Login</button>
+      <button id="signup-btn">Sign Up</button>
+    </div>
+    <div id="user-balance" style="display:block;">
+      <h2>User Balance: $<span id="user-balance-amount">0</span></h2>
+    </div>
+    <div id="investment-form" style="display:block;">
+      <h2>Enter Investment Details</h2>
+      <select id="investment-option">
+        <option value="">Select Investment</option>
+      </select>
+      <input type="number" id="investment-amount" placeholder="Investment Amount">
+      <button id="submit-investment">Submit Investment</button>
+    </div>
+    <div id="investment-balance" style="display:block;">
+      <h2>Total Investment Balance: $<span id="balance-amount">0</span></h2>
+    </div>
+    <div id="income-balance-board" style="display:none;">
+      <h2>Income Balance Board</h2>
+      <ul id="income-balance-list"></ul>
+    </div>
+    <div id="investments-list" style="display:block;">
+      <h2>Your Investments</h2>
+      <ul id="investment-list"></ul>
+    </div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+  <script src="appp.js"></script>
+</body>
+</html>

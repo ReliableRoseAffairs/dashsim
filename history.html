@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Bank App</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="test.css">
+  <style>
+    
+
+   .navbar {
+      background-color: #007;
+      padding: 10px 20px;
+      position: absolute;
+      text-decoration: none;
+      top: 0;
+      left: -250px; /* Initially hide navbar completely */
+      width: 200px;
+      height: 100%;
+      transition: left 0.3s ease; /* Add transition for smooth animation */
+    }
+
+    .navbar.active {
+      left: 0; /* Move navbar into view */
+    }
+
+    .navbar-toggler {
+      background: #007;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: 1.8em;
+      position: absolute;
+      top: 10px;
+      right: -50px;
+    }
+
+    .navbar-nav {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-item {
+      margin-right: 20px;
+    }
+
+    .nav-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 12px;
+      display: block;
+      padding-block: 12px;
+    }
+
+    .nav-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  
+<nav class="navbar" id="navbar">
+    <button class="navbar-toggler" id="navbarToggler">
+      <i class="fas fa-bars"></i>
+    </button>
+    <ul class="navbar-nav" id="navItems">
+   <li class="nav-item">
+        <a href="dashboardfinal.html" class="nav-link"><i class="fas fa-wallet"></i> Home</a>
+      </li>
+      <li class="nav-item">
+        <a href="deposit.html" class="nav-link"><i class="fas fa-user"></i> Deposit</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link"><i class="fas fa-exchange-alt"></i> Withdraw</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link"><i class="fas fa-credit-card"></i> Transaction History</a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+      </li>
+         <li class="nav-item">
+        <a href="#" id="logout-btn" class="nav-link"><i class="fas fa-cog"></i> Logout</a>
+      </li>
+    </ul>
+  </nav>
+  
+<div class="user-bar">
+    <div class="user-info">
+      <div class="user-profile">
+                          
+        <p> <span id="userNameDisplay"></span></p>
+      </div>
+      <button id="notificationBtn"><i class="fas fa-bell"></i></button> <!-- Notification button -->
+    </div>
+  </div>
+  
+  <main>
+    
+  
+      
+    
+       <section id="bonus-section">
+  <div class="bonus-panel" id="pending-bonus">
+    <h2><i class="fas fa-hourglass-half" style="color: #007;"></i> balance</h2>
+    <p id="balance-display" style="color: #007;">$0.00</p>
+  </div>
+</section>
+    
+      <ul id="transactionList">
+    <table id="transaction-table">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="transaction-list">
+      <!-- Transaction rows will be dynamically added here -->
+    </tbody>
+  </table>
+  </div>
+  </div>
+      </ul>
+    </section>
+    
+    
+  </main>
+  
+    <script>
+    const navbarToggler = document.getElementById('navbarToggler');
+    const navbar = document.getElementById('navbar');
+
+    navbarToggler.addEventListener('click', () => {
+      navbar.classList.toggle('active');
+    });
+  </script>
+  <script src="buttons.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-firestore.js"></script>
+    <script>
+        // Initialize Firebase
+       var firebaseConfig = {
+  apiKey: "AIzaSyAtVvPjdsj84mWqaG4-7SyjbljCnslZ1SM",
+  authDomain: "hendaa-1.firebaseapp.com",
+  databaseURL: "https://hendaa-1-default-rtdb.firebaseio.com",
+  projectId: "hendaa-1",
+  storageBucket: "hendaa-1.appspot.com",
+  messagingSenderId: "831134776479",
+  appId: "1:831134776479:web:56cd7098fc69cd70a376aa"
+};
+        firebase.initializeApp(firebaseConfig);
+        
+        // Initialize Firebase services
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        db.settings({ timestampsInSnapshots: true });
+
+        // Function to display user balance
+        function displayBalance() {
+            // Check if the user is authenticated
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    const userId = user.uid;
+                    const userRef = db.collection('users').doc(userId);
+
+                    // Retrieve user balance from Firestore
+                    userRef.get().then((doc) => {
+                        if (doc.exists) {
+                            const balance = doc.data().balance;
+                            document.getElementById('balance-display').innerText = `$ ${balance}`;
+                        } else {
+                            console.log("No such document!");
+                        }
+                    }).catch((error) => {
+                        console.error("Error getting user document:", error);
+                    });
+                } else {
+                    // User is not signed in
+                    console.log("User is not signed in.");
+                }
+            });
+        }
+
+        // Function to handle user logout
+        function logout() {
+            auth.signOut().then(() => {
+                console.log("User signed out");
+                // Redirect the user to the login page after sign-out
+                window.location.href = "login.html";
+            }).catch((error) => {
+                console.error("Error signing out:", error);
+            });
+        }
+        
+
+
+        // Function to display user email
+function displayUserEmail() {
+    // Check if the user is authenticated
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            // User is signed in
+            const userEmail = user.email;
+            document.getElementById('user-email').innerText = userEmail;
+        } else {
+            // User is not signed in
+            console.log("User is not signed in.");
+        }
+    });
+}
+function getCurrentUserName() {
+            // Assuming you have a collection named 'users' and a document with the current user's ID
+            const currentUserID = firebase.auth().currentUser.uid;
+
+            // Reference to the document containing user data
+            const userRef = db.collection('users').doc(currentUserID);
+
+            // Fetch the document
+            userRef.get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        // Get the user's name from the document data
+                        const userName = doc.data().name;
+
+                        // Display the user's name on the dashboard
+                        document.getElementById('userNameDisplay').innerText = "Welcome, " + userName + "!";
+                    } else {
+                        console.log("No such document!");
+                    }
+                })
+                .catch((error) => {
+                    console.log("Error getting document:", error);
+                });
+        }
+
+        // Listen for authentication state changes
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // If user is logged in, call the function to display the current user's name
+                getCurrentUserName();
+            } else {
+                // If user is not logged in, redirect to the login page or handle as needed
+                window.location.replace("login.html");
+            }
+        });
+
+// Call the function to display user email
+
+function displayTransactionHistory() {
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            db.collection("transactions").where("userId", "==", user.uid).get().then((querySnapshot) => {
+                const transactionTable = document.getElementById("transaction-table");
+                const transactionList = document.getElementById("transaction-list");
+                transactionList.innerHTML = ""; // Clear previous data
+
+                querySnapshot.forEach((doc) => {
+                    const transaction = doc.data();
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${transaction.type}</td>
+                        <td>$${transaction.amount}</td>
+                        <td class="${transaction.status === 'Approved' ? 'approved' : ''}">${transaction.status}</td>
+                    `;
+                    transactionList.appendChild(row);
+                });
+            }).catch((error) => {
+                console.log("Error getting documents: ", error);
+            });
+        } else {
+            // Redirect to login page if no user is signed in
+            window.location.href = "login.html";
+        }
+    });
+}
+
+// Call the function to display user balance and transaction history
+displayBalance();
+displayTransactionHistory();
+displayUserEmail();
+// Add event listener to the logout button
+        document.getElementById('logout-btn').addEventListener('click', logout);
+    </script>
+</body>
+</html>

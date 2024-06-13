@@ -1,0 +1,228 @@
+@import url("https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&amp;display=swap");
+
+body {
+  font-family: "Nunito", sans-serif;
+  overflow-x: hidden !important;
+  font-size: 16px;
+  color: #161c2d;
+}
+
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-family: "Nunito", sans-serif;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.user-bar {
+  background-color: #fff;
+  color: #007;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between; /* Adjusted alignment to space between */
+  align-items: center;
+  border-radius: 0 0 10px 10px; /* Add border radius */
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+}
+
+.user-profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 40px;
+  border: 2px solid #007;
+}
+
+.user-profile p {
+  margin: 5px;
+  font-size: 12px;
+    margin-left: 30px;
+}
+
+#notificationBtn {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: 140px; 
+  color: #007;
+  /* Pushes the notification icon to the right edge */
+}
+
+/* Rest of your CSS styles */
+
+main {
+  padding: 20px;
+}
+
+section {
+  background-color: #007;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#bonus-section,#transactions {
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  color: #ccc;
+  margin-bottom: -25px;
+  font-size: 16px;
+}
+
+#balance-display {
+  font-size: 32px;
+  color: #fff;
+}
+
+#detailsBtn {
+  color: #007;
+  background: #ccc;
+  border: 1px solid #007;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: -40px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.buttons button {
+  padding: 10px 30px;
+  background-color: #fff;
+  color: #007;
+  border: none;
+  border-radius: 5px; /* Add border radius */
+  cursor: pointer;
+}
+
+.buttons button:hover {
+  background-color: #0056b3;
+}
+
+.balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/* Your existing CSS styles */
+
+.profit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#totalProfit {
+  font-size: 24px;
+  color: #fff;
+}
+/* Your existing CSS styles */
+
+.bonus-header,
+.referral-bonus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#bonusAmount,#pending-balance,
+#referralBonusAmount {
+  font-size: 24px;
+  color: #fff;
+}
+#bonus-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+}
+
+.bonus-panel {
+  background-color: #f2f2f2;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #007;
+}
+
+.bonus-panel h2 {
+  font-size: 18px;
+  color: #111;
+}
+
+.bonus-panel p {
+  font-size: 24px;
+}
+.transaction-title {
+  color: #007;
+}
+
+  table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ffff;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #ffff;
+    }
+    /* Your existing CSS styles */
+
+/* Additional styles for transaction history table */
+#transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    
+}
+
+#transaction-table th, #transaction-table td {
+    border: 1px solid #ffff;
+    padding: 10px 10px;
+}
+
+#transaction-table th {
+    background-color: #f2f2f2;
+    border-radius: 5px;
+}
+
+/* Styles for 'Approved' status */
+.approved {
+    color: #1666c4;
+    font-weight: 400;
+}
