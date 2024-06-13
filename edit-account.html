@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+      <link rel="stylesheet" href="design.css">
+    <style>
+        body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f1f1f1;
+}
+
+header {
+  background-color: rgba(255, 255, 255, .5);
+  color: #111;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  color: #111;
+}
+main {
+
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.profile-section {
+          background: url('../images/dark-rays-1.png'), var(--bg-primary-responsive-nav);
+  border: 1px solid #007;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 0 10px; #111;
+}
+
+.profile-section h2 {
+  color: #007;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+input[type="password"],
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea {
+  width: 90%;
+  padding: 10px;
+  border: 1px solid #007;
+  border-radius: 5px;
+}
+textarea {
+  resize: vertical;
+}
+
+button {
+  background-color: #007;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+.link {
+  background: #fff;
+  color: #007;
+  border: none;
+  padding: 10px 10px;
+  border-radius: 5px;
+  margin-right: 230px;
+  text-decoration: none;
+  cursor: pointer;
+}
+    </style>
+</head>
+<body>
+  
+<header>
+  <h1>Edit Details</h1>
+  <a href="myaccount.html" class="link">Back</a>
+</header>
+  <main>
+    
+    <section>
+      
+       <div class="profile-section">
+        <h2>Edit Profile</h2>
+       
+        <div id="profileInfo">
+                   <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
+            <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
+            <p><strong>Phone:</strong> <span id="profilePhone">Loading...</span></p>
+            <p><strong>Balance:</strong> $<span id="profileBalance">0.00</span></p>
+            <p><strong>Last Login:</strong> <span id="profileLastLogin">Loading...</span></p>
+        </div>
+</section>
+<br>
+        <div class="profile-section">
+            <h2>Edit Account</h2>
+              <form id="editAccountForm">
+                <label for="editName">Name:</label>
+                <input type="text" id="editName" name="editName" required>
+                <label for="editEmail">Email:</label>
+                <input type="email" id="editEmail" name="editEmail" required>
+                <label for="editPhone">Phone:</label>
+                <input type="text" id="editPhone" name="editPhone" required>
+                
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+        </section>
+        <br>
+        <div class="profile-section">
+            <h2>Change Password</h2>
+            <form id="changePasswordForm">
+    <label for="oldPassword">Old Password:</label>
+                <input type="password" id="oldPassword" name="oldPassword" required>
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" name="newPassword" required>
+                
+                <button type="submit">Change Password</button>
+            </form>
+        </div>
+    </section>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+     <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtVvPjdsj84mWqaG4-7SyjbljCnslZ1SM",
+  authDomain: "hendaa-1.firebaseapp.com",
+  databaseURL: "https://hendaa-1-default-rtdb.firebaseio.com",
+  projectId: "hendaa-1",
+  storageBucket: "hendaa-1.appspot.com",
+  messagingSenderId: "831134776479",
+  appId: "1:831134776479:web:56cd7098fc69cd70a376aa"
+};
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function getUserProfile() {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                const userId = user.uid;
+                db.collection('users').doc(userId).get().then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('profileName').textContent = data.name;
+                        document.getElementById('profileEmail').textContent = user.email;
+                        document.getElementById('profilePhone').textContent = data.phone || 'N/A';
+                        document.getElementById('profileBalance').textContent = data.balance.toFixed(2);
+                        document.getElementById('profileLastLogin').textContent = user.metadata.lastSignInTime;
+
+                        document.getElementById('editName').value = data.name;
+                        document.getElementById('editEmail').value = user.email;
+                        document.getElementById('editPhone').value = data.phone || '';
+                    } else {
+                        console.error('No such document!');
+                    }
+                }).catch(error => {
+                    console.error('Error getting document:', error);
+                });
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+
+        document.getElementById('editAccountForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const newName = document.getElementById('editName').value;
+            const newEmail = document.getElementById('editEmail').value;
+            const newPhone = document.getElementById('editPhone').value;
+            const user = firebase.auth().currentUser;
+            if (user) {
+                const userId = user.uid;
+            
+                db.collection('users').doc(userId).update({
+    name: newName,
+    phone: newPhone
+}).then(() => {
+    user.updateEmail(newEmail).then(() => {
+        alert('Profile updated successfully!');
+        getUserProfile();
+    }).catch(error => {
+        console.error('Error updating email:', error);
+        alert('Error updating email. Please try again.');
+    });
+}).catch(error => {
+    console.error('Error updating profile:', error);
+});
+}
+});
+
+document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
+event.preventDefault();
+const oldPassword = document.getElementById('oldPassword').value;
+const newPassword = document.getElementById('newPassword').value;
+const user = firebase.auth().currentUser;
+if (user) {
+    const credential = firebase.auth.EmailAuthProvider.credential(
+        user.email,
+        oldPassword
+    );
+    user.reauthenticateWithCredential(credential).then(() => {
+        user.updatePassword(newPassword).then(() => {
+            alert('Password changed successfully!');
+        }).catch(error => {
+            console.error('Error changing password:', error);
+            alert('Error changing password. Please try again.');
+        });
+    }).catch(error => {
+        console.error('Error reauthenticating user:', error);
+        alert('Error reauthenticating user. Please check your old password.');
+    });
+}
+});
+
+firebase.auth().onAuthStateChanged(user => {
+if (user) {
+    getUserProfile();
+} else {
+    window.location.href = 'login.html';
+}
+});
+</script>
+</body>
+</html>
